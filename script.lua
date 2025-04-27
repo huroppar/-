@@ -1,45 +1,50 @@
--- ライブラリロード
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+-- OrionLib読み込み
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
--- GUI作成
-local Window = Rayfield:CreateWindow({
+-- ウィンドウ作成
+local Window = OrionLib:MakeWindow({
     Name = "Skibidi Tower Defense - Auto Destroy",
-    LoadingTitle = "Starting up...",
-    LoadingSubtitle = "by YourName",
-    ConfigurationSaving = {
-        Enabled = false,
-    }
+    HidePremium = false,
+    SaveConfig = false,
+    IntroEnabled = false
 })
 
--- タブ作成
-local MainTab = Window:CreateTab("Main", 4483362458)
+-- メインタブ作成
+local MainTab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
 
 -- 状態管理
-local AutoAttack = false
+local AutoKill = false
 
--- セクション作成
-local MainSection = MainTab:CreateSection("Auto Farm")
-
--- ボタンスイッチ作成
-local Toggle = MainTab:CreateToggle({
+-- トグルボタン作成
+MainTab:AddToggle({
     Name = "Auto Kill Enemies",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
-        AutoAttack = Value
-    end,
+        AutoKill = Value
+    end    
 })
 
 -- 実行ループ
 task.spawn(function()
     while task.wait(0.1) do
-        if AutoAttack then
-            -- 敵リストを探す
+        if AutoKill then
             for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
                 if enemy:FindFirstChild("Humanoid") then
-                    -- ダメージを与える処理（仮）
-                    enemy.Humanoid.Health = 0
+                    enemy.Humanoid.Health = 0 -- 仮のダメージ処理
                 end
             end
         end
     end
 end)
+
+-- 完了通知
+OrionLib:MakeNotification({
+    Name = "準備完了",
+    Content = "オートキル起動準備できたぞ！",
+    Image = "rbxassetid://4483345998",
+    Time = 5
+})
