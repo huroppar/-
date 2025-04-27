@@ -10,23 +10,19 @@ local Window = RayField.CreateWindow({
 
 -- スタートボタンを作成
 local StartButton = Window:CreateButton({
-    Text = "Start Auto-Clear",
+    Text = "Start Auto-Clear",  -- ボタンのテキスト
     Size = UDim2.new(0, 200, 0, 50),
     Position = UDim2.new(0.5, -100, 0.2, 0),
     Callback = function()
-        print("Auto-Clear Started!")
-        StartAutoClear()  -- 自動クリアを開始する関数を呼び出す
-    end
-})
-
--- 停止ボタンを作成
-local StopButton = Window:CreateButton({
-    Text = "Stop Auto-Clear",
-    Size = UDim2.new(0, 200, 0, 50),
-    Position = UDim2.new(0.5, -100, 0.3, 0),
-    Callback = function()
-        print("Auto-Clear Stopped!")
-        StopAutoClear()  -- 自動クリアを停止する関数を呼び出す
+        if not autoClearActive then
+            print("Auto-Clear Started!")
+            StartAutoClear()  -- 自動クリアを開始する関数を呼び出す
+            StartButton.Text = "Stop Auto-Clear"  -- ボタンのテキストを変更
+        else
+            print("Auto-Clear Stopped!")
+            StopAutoClear()  -- 自動クリアを停止する関数を呼び出す
+            StartButton.Text = "Start Auto-Clear"  -- ボタンのテキストを変更
+        end
     end
 })
 
