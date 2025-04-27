@@ -1,5 +1,6 @@
 -- OrionLib読み込み
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))()
+
 
 -- ウィンドウ作成
 local Window = OrionLib:MakeWindow({
