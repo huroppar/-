@@ -1,73 +1,45 @@
-local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))()
+-- ライブラリロード
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
--- OrionLibウィンドウ作成
-local Window = OrionLib:MakeWindow({
-    Name = "Skibidi Tower Defense Helper",  -- ウィンドウの名前
-    HidePremium = false,  -- プレミアムユーザー向けの表示設定
-    SaveConfig = true,  -- 設定を保存
-    ConfigFolder = "OrionLibExample",  -- 設定の保存フォルダ
+-- GUI作成
+local Window = Rayfield:CreateWindow({
+    Name = "Skibidi Tower Defense - Auto Destroy",
+    LoadingTitle = "Starting up...",
+    LoadingSubtitle = "by YourName",
+    ConfigurationSaving = {
+        Enabled = false,
+    }
 })
 
--- 「Start Auto-Clear」ボタンを作成
-Window:MakeButton({
-    Name = "Start Auto-Clear",
-    Callback = function()
-        print("Auto-Clear Started!")
-        StartAutoClear()
-    end
+-- タブ作成
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+-- 状態管理
+local AutoAttack = false
+
+-- セクション作成
+local MainSection = MainTab:CreateSection("Auto Farm")
+
+-- ボタンスイッチ作成
+local Toggle = MainTab:CreateToggle({
+    Name = "Auto Kill Enemies",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoAttack = Value
+    end,
 })
 
--- 「Stop Auto-Clear」ボタンを作成
-Window:MakeButton({
-    Name = "Stop Auto-Clear",
-    Callback = function()
-        print("Auto-Clear Stopped!")
-        StopAutoClear()
-    end
-})
-
--- 自動クリアのフラグ
-local autoClearActive = false
-
--- 自動クリア開始の関数
-function StartAutoClear()
-    autoClearActive = true
-    
-    -- Waveごとに繰り返す
-    while autoClearActive do
-        -- 現在のWaveの進行状況をチェック
-        local currentWave = game.ReplicatedStorage.GameData.Wave.Value
-        
-        -- 次のWaveに進むための条件
-        if currentWave >= 1 then
-            -- タワーを強化または配置する
-            AutoPlaceTowers()  -- タワーを自動で配置・強化
+-- 実行ループ
+task.spawn(function()
+    while task.wait(0.1) do
+        if AutoAttack then
+            -- 敵リストを探す
+            for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                if enemy:FindFirstChild("Humanoid") then
+                    -- ダメージを与える処理（仮）
+                    enemy.Humanoid.Health = 0
+                end
+            end
         end
-        
-        -- Waveがクリアできたら次に進む
-        if currentWave == game.ReplicatedStorage.GameData.MaxWave.Value then
-            print("Wave " .. currentWave .. " cleared!")
-            -- ここで報酬を得る処理を追加したり、次のWaveに進む処理を行う
-            game.ReplicatedStorage.GameData.Wave.Value = currentWave + 1
-        end
-
-        wait(2)  -- 一定間隔でチェックを行う
     end
-end
-
--- 自動クリアを停止する関数
-function StopAutoClear()
-    autoClearActive = false
-end
-
--- タワーを自動で配置・強化する関数（簡易例）
-function AutoPlaceTowers()
-    -- 配置するタワーを決定（例：最も効果的な位置に配置）
-    local towerPosition = Vector3.new(10, 0, 10)  -- 仮の位置
-    local tower = game.ReplicatedStorage.TowerModels["SkibidiTower"]:Clone()
-    tower.Parent = game.Workspace
-    tower:SetPrimaryPartCFrame(CFrame.new(towerPosition))
-    
-    -- タワー強化（例えばレベル2にする）
-    tower.Level.Value = 2  -- 仮の強化処理
-end
+end)
