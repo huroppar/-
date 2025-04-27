@@ -1,33 +1,24 @@
--- RoStrapを読み込む
-local RoStrap = require(game:GetService("ReplicatedStorage"):WaitForChild("RoStrap"))
+-- GuiPlusを読み込む
+local GuiPlus = require(game:GetService("ReplicatedStorage"):WaitForChild("GuiPlus"))
 
--- GUIウィンドウ作成
-local Window = RoStrap.CreateWindow({
+-- ウィンドウを作成
+local Window = GuiPlus.NewWindow({
     Title = "Skibidi Tower Defense Helper",
-    Size = UDim2.new(0, 400, 0, 500)
+    Size = UDim2.new(0, 400, 0, 500),
+    Position = UDim2.new(0.5, -200, 0.5, -250)
 })
 
--- スタートボタンを作成
-local StartButton = Window:CreateButton({
-    Text = "Start Auto-Clear",
-    Size = UDim2.new(0, 200, 0, 50),
-    Position = UDim2.new(0.5, -100, 0.2, 0),
-    Callback = function()
-        print("Auto-Clear Started!")
-        StartAutoClear()
-    end
-})
+-- ボタンを追加
+local StartButton = Window:CreateButton("Start Auto-Clear", function()
+    print("Auto-Clear Started!")
+    StartAutoClear()
+end)
 
--- 停止ボタンを作成
-local StopButton = Window:CreateButton({
-    Text = "Stop Auto-Clear",
-    Size = UDim2.new(0, 200, 0, 50),
-    Position = UDim2.new(0.5, -100, 0.3, 0),
-    Callback = function()
-        print("Auto-Clear Stopped!")
-        StopAutoClear()
-    end
-})
+local StopButton = Window:CreateButton("Stop Auto-Clear", function()
+    print("Auto-Clear Stopped!")
+    StopAutoClear()
+end)
+
 
 -- 自動クリア開始のフラグ
 local autoClearActive = false
