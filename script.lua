@@ -1,28 +1,31 @@
--- RayFieldライブラリの読み込み
-local RayField = require(game:GetService("ReplicatedStorage"):WaitForChild("RayField"))
+-- RoStrapを読み込む
+local RoStrap = require(game:GetService("ReplicatedStorage"):WaitForChild("RoStrap"))
 
--- GUIウィンドウを作成
-local Window = RayField.CreateWindow({
-    Title = "Skibidi Tower Defense Helper",  -- ウィンドウのタイトル
-    Size = UDim2.new(0, 400, 0, 500),       -- サイズ設定
-    Position = UDim2.new(0.5, -200, 0.5, -250),  -- 画面中央に配置
+-- GUIウィンドウ作成
+local Window = RoStrap.CreateWindow({
+    Title = "Skibidi Tower Defense Helper",
+    Size = UDim2.new(0, 400, 0, 500)
 })
 
 -- スタートボタンを作成
 local StartButton = Window:CreateButton({
-    Text = "Start Auto-Clear",  -- ボタンのテキスト
+    Text = "Start Auto-Clear",
     Size = UDim2.new(0, 200, 0, 50),
     Position = UDim2.new(0.5, -100, 0.2, 0),
     Callback = function()
-        if not autoClearActive then
-            print("Auto-Clear Started!")
-            StartAutoClear()  -- 自動クリアを開始する関数を呼び出す
-            StartButton.Text = "Stop Auto-Clear"  -- ボタンのテキストを変更
-        else
-            print("Auto-Clear Stopped!")
-            StopAutoClear()  -- 自動クリアを停止する関数を呼び出す
-            StartButton.Text = "Start Auto-Clear"  -- ボタンのテキストを変更
-        end
+        print("Auto-Clear Started!")
+        StartAutoClear()
+    end
+})
+
+-- 停止ボタンを作成
+local StopButton = Window:CreateButton({
+    Text = "Stop Auto-Clear",
+    Size = UDim2.new(0, 200, 0, 50),
+    Position = UDim2.new(0.5, -100, 0.3, 0),
+    Callback = function()
+        print("Auto-Clear Stopped!")
+        StopAutoClear()
     end
 })
 
