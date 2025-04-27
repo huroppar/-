@@ -1,29 +1,35 @@
--- GuiPlusを読み込む
-local GuiPlus = require(game:GetService("ReplicatedStorage"):WaitForChild("GuiPlus"))
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/master/source"))()
 
--- ウィンドウを作成
-local Window = GuiPlus.NewWindow({
-    Title = "Skibidi Tower Defense Helper",
-    Size = UDim2.new(0, 400, 0, 500),
-    Position = UDim2.new(0.5, -200, 0.5, -250)
+-- OrionLibウィンドウ作成
+local Window = OrionLib:MakeWindow({
+    Name = "Skibidi Tower Defense Helper",  -- ウィンドウの名前
+    HidePremium = false,  -- プレミアムユーザー向けの表示設定
+    SaveConfig = true,  -- 設定を保存
+    ConfigFolder = "OrionLibExample",  -- 設定の保存フォルダ
 })
 
--- ボタンを追加
-local StartButton = Window:CreateButton("Start Auto-Clear", function()
-    print("Auto-Clear Started!")
-    StartAutoClear()
-end)
+-- 「Start Auto-Clear」ボタンを作成
+Window:MakeButton({
+    Name = "Start Auto-Clear",
+    Callback = function()
+        print("Auto-Clear Started!")
+        StartAutoClear()
+    end
+})
 
-local StopButton = Window:CreateButton("Stop Auto-Clear", function()
-    print("Auto-Clear Stopped!")
-    StopAutoClear()
-end)
+-- 「Stop Auto-Clear」ボタンを作成
+Window:MakeButton({
+    Name = "Stop Auto-Clear",
+    Callback = function()
+        print("Auto-Clear Stopped!")
+        StopAutoClear()
+    end
+})
 
-
--- 自動クリア開始のフラグ
+-- 自動クリアのフラグ
 local autoClearActive = false
 
--- 自動クリアを開始する関数
+-- 自動クリア開始の関数
 function StartAutoClear()
     autoClearActive = true
     
