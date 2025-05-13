@@ -1,51 +1,73 @@
--- OrionLib読み込み
-local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))()
+-- OrionLibの読み込み
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
+local player = game.Players.LocalPlayer
+local currentWalkSpeed = 16
+local infiniteJumpEnabled = false
+
+-- 現在のHumanoidを取得する関数
+local function getHumanoid()
+	local char = player.Character or player.CharacterAdded:Wait()
+	return char:WaitForChild("Humanoid")
+end
 
 -- ウィンドウ作成
 local Window = OrionLib:MakeWindow({
-    Name = "Skibidi Tower Defense - Auto Destroy",
-    HidePremium = false,
-    SaveConfig = false,
-    IntroEnabled = false
+	Name = "🔥 Speed & 無限ジャンプ GUI",
+	HidePremium = false,
+	SaveConfig = true,
+	ConfigFolder = "SpeedJumpConfig"
 })
 
--- メインタブ作成
-local MainTab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
+local Tab = Window:MakeTab({
+	Name = "メイン機能",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
 })
 
--- 状態管理
-local AutoKill = false
-
--- トグルボタン作成
-MainTab:AddToggle({
-    Name = "Auto Kill Enemies",
-    Default = false,
-    Callback = function(Value)
-        AutoKill = Value
-    end    
+-- スピードスライダー
+Tab:AddSlider({
+	Name = "移動スピード",
+	Min = 16,
+	Max = 100,
+	Default = 16,
+	Color = Color3.fromRGB(255, 170, 0),
+	Increment = 1,
+	ValueName = "スピード",
+	Callback = function(value)
+		currentWalkSpeed = value
+		local humanoid = getHumanoid()
+		if humanoid then
+			humanoid.WalkSpeed = value
+		end
+	end
 })
 
--- 実行ループ
-task.spawn(function()
-    while task.wait(0.1) do
-        if AutoKill then
-            for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                if enemy:FindFirstChild("Humanoid") then
-                    enemy.Humanoid.Health = 0 -- 仮のダメージ処理
-                end
-            end
-        end
-    end
+-- 無限ジャンプトグル
+Tab:AddToggle({
+	Name = "無限ジャンプ",
+	Default = false,
+	Callback = function(state)
+		infiniteJumpEnabled = state
+	end
+})
+
+-- 無限ジャンプ処理
+game:GetService("UserInputService").JumpRequest:Connect(function()
+	if infiniteJumpEnabled then
+		local humanoid = getHumanoid()
+		if humanoid then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
 end)
 
--- 完了通知
-OrionLib:MakeNotification({
-    Name = "準備完了",
-    Content = "オートキル起動準備できたぞ！",
-    Image = "rbxassetid://4483345998",
-    Time = 5
-})
+-- リスポーン後もスピード反映させる
+player.CharacterAdded:Connect(function(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	task.wait(0.1)
+	humanoid.WalkSpeed = currentWalkSpeed
+end)
+
+-- GUI起動
+OrionLib:Init()
