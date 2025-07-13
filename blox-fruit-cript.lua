@@ -1,10 +1,19 @@
 local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))()
 local Window = OrionLib:MakeWindow({Name = "BloxFarm Pro", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+
+-- グローバル変数
 getgenv().autoFarm = false
 getgenv().useSkill = false
 getgenv().weaponType = "Melee"
 
+-- レベル帯ごとの敵・クエスト・NPC座標（必要に応じて拡張）
 local FarmData = {
     {
         Min = 0,
@@ -12,37 +21,28 @@ local FarmData = {
         Enemy = "Bandit",
         Quest = "BanditQuest1",
         NPCPos = Vector3.new(1060, 17, 1547)
-    }
+    },
+    -- ここに他のレベル帯追加可能
 }
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+-- 武器タイプごとの数字キー対応
+local weaponKeyMap = {
+    Melee = "1",
+    Fruit = "2",
+    Sword = "3",
+    Gun = "4"
+}
 
-local function getTool()
-    local char = player.Character
-    for _, tool in pairs(char:GetChildren()) do
-        if tool:IsA("Tool") then
-            return tool
-        end
-    end
-    return nil
-end
-
-local function equipTool(tool)
-    local char = player.Character
-    if not tool then return end
-    if not char or not char:FindFirstChild(tool.Name) then
-        tool.Parent = char
-        task.wait(0.2)
-    end
-end
-
+-- 敵取得関数（生きてる一番近い敵を取得）
 local function getEnemy(name)
     local closest = nil
     local shortest = math.huge
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+
     for _, enemy in pairs(workspace.Enemies:GetChildren()) do
         if enemy.Name == name and enemy:FindFirstChild("Humanoid") and enemy:FindFirstChild("HumanoidRootPart") and enemy.Humanoid.Health > 0 then
-            local dist = (enemy.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+            local dist = (enemy.HumanoidRootPart.Position - hrp.Position).Magnitude
             if dist < shortest then
                 shortest = dist
                 closest = enemy
@@ -52,6 +52,7 @@ local function getEnemy(name)
     return closest
 end
 
+-- レベルに応じて対象データ取得
 local function getTargetData()
     local lv = player.Data.Level.Value
     for _, data in pairs(FarmData) do
@@ -61,47 +62,63 @@ local function getTargetData()
     end
 end
 
-local function attack()
-    local vim = game:GetService("VirtualInputManager")
-    local tool = getTool()
-    if tool then
-        equipTool(tool)
-        tool:Activate()
-    end
-
-    if getgenv().useSkill then
-        task.wait(0.15)
-        vim:SendKeyEvent(true, "Z", false, game)
-        task.wait(0.05)
-        vim:SendKeyEvent(false, "Z", false, game)
+-- 武器切り替え（数字キー押し）
+local function equipWeapon(weaponType)
+    local key = weaponKeyMap[weaponType]
+    if key then
+        VirtualInputManager:SendKeyEvent(true, key, false, game)
+        task.wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, key, false, game)
+        task.wait(0.1)
     end
 end
 
+-- マウス左クリックシミュレート
+local function click()
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+    task.wait(0.05)
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+end
+
+-- 空中にピタッと止まる関数
 local function floatAboveEnemy(enemy)
-    local char = player.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    local humanoid = char and char:FindFirstChild("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
     if not hrp or not humanoid or not enemy or not enemy:FindFirstChild("HumanoidRootPart") then return end
 
-    -- 空中固定用設定
     humanoid.PlatformStand = true
-    local bodyVelocity = hrp:FindFirstChild("BodyVelocity") or Instance.new("BodyVelocity")
-    bodyVelocity.Velocity = Vector3.new(0,0,0)
-    bodyVelocity.MaxForce = Vector3.new(1e5,1e5,1e5)
-    bodyVelocity.Parent = hrp
+
+    local bodyVelocity = hrp:FindFirstChild("BodyVelocity")
+    if not bodyVelocity then
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(1e5,1e5,1e5)
+        bodyVelocity.Parent = hrp
+    end
 
     while getgenv().autoFarm and enemy.Humanoid.Health > 0 do
-        local targetPos = enemy.HumanoidRootPart.Position + Vector3.new(0, 20, 0)
+        local targetPos = enemy.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
         hrp.CFrame = CFrame.lookAt(targetPos, enemy.HumanoidRootPart.Position)
         bodyVelocity.Velocity = Vector3.new(0,0,0)
         task.wait(0.1)
     end
 
-    -- 終了時は元に戻す
     humanoid.PlatformStand = false
     if bodyVelocity then bodyVelocity:Destroy() end
 end
 
+-- 攻撃関数
+local function attack()
+    equipWeapon(getgenv().weaponType)
+    click()
+    if getgenv().useSkill then
+        task.wait(0.15)
+        VirtualInputManager:SendKeyEvent(true, "Z", false, game)
+        task.wait(0.05)
+        VirtualInputManager:SendKeyEvent(false, "Z", false, game)
+    end
+end
+
+-- メインオートファームループ
 task.spawn(function()
     while task.wait(0.3) do
         if getgenv().autoFarm then
@@ -110,7 +127,6 @@ task.spawn(function()
 
             local enemy = getEnemy(data.Enemy)
             if enemy then
-                -- 上空に固定して攻撃ループ
                 task.spawn(function() floatAboveEnemy(enemy) end)
                 attack()
             end
@@ -118,7 +134,7 @@ task.spawn(function()
     end
 end)
 
--- GUI構築
+-- GUI作成
 local tab = Window:MakeTab({Name = "Auto Farm", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
 tab:AddToggle({
@@ -132,7 +148,7 @@ tab:AddToggle({
 tab:AddDropdown({
     Name = "武器タイプ",
     Default = "Melee",
-    Options = {"Melee", "Sword", "Gun", "Fruit"},
+    Options = {"Melee", "Fruit", "Sword", "Gun"},
     Callback = function(v)
         getgenv().weaponType = v
     end
@@ -147,3 +163,4 @@ tab:AddToggle({
 })
 
 OrionLib:Init()
+
