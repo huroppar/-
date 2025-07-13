@@ -91,7 +91,7 @@ local function floatAboveEnemy(enemy)
     bodyVelocity.Parent = hrp
 
     while getgenv().autoFarm and enemy.Humanoid.Health > 0 do
-        local targetPos = enemy.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
+        local targetPos = enemy.HumanoidRootPart.Position + Vector3.new(0, 20, 0)
         hrp.CFrame = CFrame.lookAt(targetPos, enemy.HumanoidRootPart.Position)
         bodyVelocity.Velocity = Vector3.new(0,0,0)
         task.wait(0.1)
