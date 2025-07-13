@@ -1,5 +1,5 @@
 local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))()
-local Window = OrionLib:MakeWindow({Name = "BloxFarm Pro", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+local Window = OrionLib:MakeWindow({Name = "BloxFarm", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
