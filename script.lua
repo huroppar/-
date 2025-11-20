@@ -1,6 +1,6 @@
 local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
-local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/WRUyYTdY"))();
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/jensonhirst/Orion/main/source"))();
 local Window = OrionLib:MakeWindow({Name="wos script",HidePremium=false,SaveConfig=true,ConfigFolder="WOS_Config"});
 local MainTab = Window:MakeTab({Name="メイン",Icon="rbxassetid://4483345998",PremiumOnly=false});
 local ChestTab = Window:MakeTab({Name="チェスト",Icon="rbxassetid://4483345998",PremiumOnly=false});
