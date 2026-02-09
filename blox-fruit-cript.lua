@@ -16,10 +16,6 @@ local Window = Rayfield:CreateWindow({
     KeySystem = false
 })
 
---================================
--- プレイヤータブ
---================================
-local playerTab = Window:CreateTab("プレイヤー", 4483362458)
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/huroppar/-/refs/heads/main/3script.lua"))()
 --================================
